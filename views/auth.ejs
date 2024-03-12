@@ -1,0 +1,52 @@
+<%- include('partials/head') %>
+
+<div
+  class=""
+  id="authModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered"
+    role="document"
+    style="left: 0"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="btn btn-primary modal__btn btn__signin">Sign In</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal__title">Register</p>
+        <form class="modal__form" action="/auth/register" method="post">
+          <input
+            type="text"
+            name="username"
+            placeholder="Type your name"
+            required
+            class="regist__input regist__name"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Type your Email"
+            required
+            class="regist__input regist__email"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Type your password"
+            required
+            autocomplete="on"
+            class="regist__input regist__password"
+          />
+          <button type="submit" class="btn btn-primary">Confirm</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/scripts') %>
+
