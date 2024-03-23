@@ -1,4 +1,6 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -14,11 +16,21 @@ export class MessagesGateway {
 
   @SubscribeMessage('sendMessage')
   async handleMessage(
+    @ConnectedSocket()
     client: Socket,
-    payload: { content: string; userId: number },
+    @MessageBody()
+    payload: { content: string; userId: number; roomId: number },
   ): Promise<void> {
-    const { content, userId } = payload;
-    const createdMessage = await this.messagesService.create(content, userId);
+    const createdMessage = await this.messagesService.create(
+      payload.content,
+      payload.userId,
+      payload.roomId,
+    );
     this.server.emit('recMessage', createdMessage);
+  }
+
+  @SubscribeMessage('joinRoom')
+  joinRoom(socket: Socket, roomId: string) {
+    socket.join(roomId);
   }
 }

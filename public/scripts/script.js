@@ -3,12 +3,13 @@ const app = () => {
   const msgInput = document.querySelector('.messageToSend');
   const msgList = document.querySelector('.messageList');
   const sendBtn = document.querySelector('#sendBtn');
+  const contacts = document.querySelector('.contact');
   // const userList = document.querySelector('#people-list');
   // const groupFind = document.querySelector('.find');
   const allMessages = [];
   let userId;
 
-  const getMessages = async () => {
+  async function getMessages() {
     try {
       const { data } = await axios.get('http://localhost:5000/messages');
       userId = data.userId;
@@ -20,10 +21,10 @@ const app = () => {
     } catch (error) {
       console.log(error.message);
     }
-  };
+  }
   getMessages();
 
-  const renderMessages = (messages, userId) => {
+  function renderMessages(messages, userId) {
     let messagesHtml = '';
 
     messages.forEach((message) => {
@@ -41,16 +42,16 @@ const app = () => {
     });
 
     msgList.innerHTML = messagesHtml;
-  };
+  }
 
-  const handldeSendMesage = (content) => {
+  function handldeSendMesage(content) {
     if (!content.trim()) {
       return;
     } else {
-      sendMessage({ content, userId });
+      sendMessage({ content, userId, roomId });
       msgInput.value = '';
     }
-  };
+  }
 
   msgInput.addEventListener(
     'keydown',
@@ -59,12 +60,20 @@ const app = () => {
 
   sendBtn.addEventListener('click', () => handldeSendMesage(msgInput.value));
 
-  const sendMessage = (payload) => socket.emit('sendMessage', payload);
+  function sendMessage(payload) {
+    socket.emit('sendMessage', payload);
+  }
 
   socket.on('recMessage', (createdMessage) => {
     allMessages.push(createdMessage);
     renderMessages(allMessages, userId);
   });
+
+  function joinRoom(roomId) {
+    socket.emit('joinRoom', roomId);
+  }
+
+  contacts.addEventListener('click', () => joinRoom(1));
 };
 
 app();

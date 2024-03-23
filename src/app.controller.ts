@@ -1,14 +1,15 @@
-import { Controller, Get, Render, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Render, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Response, Request } from 'express';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { MessagesService } from './messages/messages.service';
+import { UsersService } from './users/users.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly messagesService: MessagesService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get()
@@ -23,7 +24,6 @@ export class AppController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('/profile')
   async profile(@Res() res: Response) {
     return res.json({ message: 'profile' });
@@ -32,8 +32,17 @@ export class AppController {
   @Get('/messages')
   async getMessages(@Res() res: Response, @Req() req: Request) {
     const token = req.cookies.token;
+    const roomId = req.body;
     const { id: userId } = await this.appService.verifyToken(token);
-    const messages = await this.messagesService.read();
+    const messages = await this.messagesService.read(roomId);
     res.json({ userId, messages });
+  }
+
+  @Get('/contacts')
+  async getContacts(@Req() req: Request, @Res() res: Response) {
+    const token = req.cookies.token;
+    const { id: userId } = await this.appService.verifyToken(token);
+    const users = await this.usersService.usersToAdd(userId);
+    res.json({ users });
   }
 }

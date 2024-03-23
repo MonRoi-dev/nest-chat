@@ -6,13 +6,21 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class MessagesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(content: string, userId: number): Promise<Message> {
+  async create(
+    content: string,
+    userId: number,
+    roomId: number,
+  ): Promise<Message> {
     return await this.prismaService.message.create({
-      data: { content, user: { connect: { id: userId } } },
+      data: {
+        content,
+        user: { connect: { id: userId } },
+        room: { connect: { id: roomId } },
+      },
     });
   }
 
-  async read() {
-    return await this.prismaService.message.findMany();
+  async read(roomId: number): Promise<Message[] | null> {
+    return await this.prismaService.message.findMany({ where: { roomId } });
   }
 }

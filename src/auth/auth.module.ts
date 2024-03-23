@@ -5,7 +5,6 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
-import { JwtStrategy } from './jwt.strategy';
 import { AuthMiddleware } from './auth.middleware';
 
 @Module({
@@ -18,7 +17,7 @@ import { AuthMiddleware } from './auth.middleware';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
