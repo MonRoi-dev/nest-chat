@@ -11,6 +11,7 @@ export class MessagesService {
     userId: number,
     roomId: number,
   ): Promise<Message> {
+    console.log(roomId);
     return await this.prismaService.message.create({
       data: {
         content,

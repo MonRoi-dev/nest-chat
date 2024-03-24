@@ -1,4 +1,13 @@
-import { Controller, Get, Render, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Render,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { Response, Request } from 'express';
 import { MessagesService } from './messages/messages.service';
@@ -16,12 +25,12 @@ export class AppController {
   @Render('index')
   async main(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies.token;
-    if (token) {
-      const user = await this.appService.verifyToken(token);
-      return { user };
-    } else {
-      res.redirect('/auth');
+    if (!token) {
+      return res.redirect('/auth');
     }
+    const user = await this.appService.verifyToken(token);
+    const users = await this.usersService.usersToAdd(user.id);
+    return { user, users };
   }
 
   @Get('/profile')
@@ -32,7 +41,7 @@ export class AppController {
   @Get('/messages')
   async getMessages(@Res() res: Response, @Req() req: Request) {
     const token = req.cookies.token;
-    const roomId = req.body;
+    const roomId = 12;
     const { id: userId } = await this.appService.verifyToken(token);
     const messages = await this.messagesService.read(roomId);
     res.json({ userId, messages });
@@ -44,5 +53,17 @@ export class AppController {
     const { id: userId } = await this.appService.verifyToken(token);
     const users = await this.usersService.usersToAdd(userId);
     res.json({ users });
+  }
+
+  @Post('/contacts/:id')
+  async addContact(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const token = req.cookies.token;
+    const { id: userId } = await this.appService.verifyToken(token);
+    await this.usersService.createRoom(userId, id);
+    return res.redirect('/');
   }
 }

@@ -15,12 +15,12 @@
 		<div id="contacts">
 			<ul>
 				<% user.rooms.forEach((room) => {%>
-				<li class="contact">
+				<li class="contact" data-room-id="<%= room.roomId %>">
 					<div class="wrap">
 						<span class="contact-status online"></span>
 						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
 						<div class="meta">
-							<p class="name"><%= room.users.username %></p>
+							<p class="name"><%= room.users.username %><%= room.roomId %></p>
 							<p class="preview"></p>
 						</div>
 					</div>

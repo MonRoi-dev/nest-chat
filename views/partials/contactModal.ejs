@@ -24,15 +24,12 @@
       </div>
       <div class="modal-body modal-body__main">
           <ul>
-            <li class="contact">
-              <div class="wrap">
-                <span class="contact-status online"></span>
-                <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
-                <div class="meta">
-                  <p class="name"></p>
-                </div>
-              </div>
-            </li>
+            <% users.forEach((contact) => {  %>
+              <form action="/contacts/<%= contact.id %>" method="post">
+                <h4 style="color: black;"><%= contact.username %></h4>
+                    <button type="submit">Add</button>
+              </form>
+            <% }) %>
           </ul>
       </div>
     </div>

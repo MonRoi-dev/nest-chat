@@ -24,6 +24,7 @@ export class AuthService {
 
   async register(data: Prisma.UserCreateInput) {
     const user: User = await this.userService.findByEmail(data.email);
+    console.log(data.email);
     if (user) {
       throw new HttpException(
         'User with that email already exist',
@@ -35,7 +36,7 @@ export class AuthService {
       ...data,
       password,
     });
-    return this.login(createdUser);
+    return await this.login(createdUser);
   }
 
   async login(data: Prisma.UserUncheckedCreateWithoutMessagesInput) {

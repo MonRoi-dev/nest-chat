@@ -24,7 +24,7 @@ export class MessagesGateway {
     const createdMessage = await this.messagesService.create(
       payload.content,
       payload.userId,
-      payload.roomId,
+      +payload.roomId,
     );
     this.server.emit('recMessage', createdMessage);
   }

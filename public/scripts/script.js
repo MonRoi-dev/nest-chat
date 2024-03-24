@@ -3,11 +3,11 @@ const app = () => {
   const msgInput = document.querySelector('.messageToSend');
   const msgList = document.querySelector('.messageList');
   const sendBtn = document.querySelector('#sendBtn');
-  const contacts = document.querySelector('.contact');
   // const userList = document.querySelector('#people-list');
   // const groupFind = document.querySelector('.find');
   const allMessages = [];
   let userId;
+  let roomId;
 
   async function getMessages() {
     try {
@@ -27,19 +27,24 @@ const app = () => {
   function renderMessages(messages, userId) {
     let messagesHtml = '';
 
-    messages.forEach((message) => {
-      if (message.userId === userId) {
-        messagesHtml += `<li class="sent">
+    if (!roomId) {
+      messages.innerHTML += `<h1>Select Room!</h1>`;
+      msgList.innerHTML = messagesHtml;
+    } else {
+      messages.forEach((message) => {
+        if (message.userId === userId) {
+          messagesHtml += `<li class="sent">
           <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
           <p>${message.content}</p>
         </li>`;
-      } else {
-        messagesHtml += `<li class="replies">
+        } else {
+          messagesHtml += `<li class="replies">
           <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
           <p>${message.content}</p>
         </li>`;
-      }
-    });
+        }
+      });
+    }
 
     msgList.innerHTML = messagesHtml;
   }
@@ -73,7 +78,17 @@ const app = () => {
     socket.emit('joinRoom', roomId);
   }
 
-  contacts.addEventListener('click', () => joinRoom(1));
+  document.addEventListener('DOMContentLoaded', function () {
+    const contacts = document.querySelectorAll('.contact');
+
+    contacts.forEach((contact) => {
+      contact.addEventListener('click', function () {
+        roomId = this.dataset.roomId;
+        getMessages();
+        joinRoom(roomId);
+      });
+    });
+  });
 };
 
 app();
