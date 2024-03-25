@@ -3,18 +3,17 @@ const app = () => {
   const msgInput = document.querySelector('.messageToSend');
   const msgList = document.querySelector('.messageList');
   const sendBtn = document.querySelector('#sendBtn');
-  // const userList = document.querySelector('#people-list');
-  // const groupFind = document.querySelector('.find');
   const allMessages = [];
   let userId;
   let roomId;
 
-  async function getMessages() {
+  async function getMessages(roomId) {
     try {
-      const { data } = await axios.get('http://localhost:5000/messages');
+      const { data } = await axios.get(
+        `http://localhost:5000/messages?roomId=${roomId}`,
+      );
       userId = data.userId;
       renderMessages(data.messages, userId);
-
       data.messages.forEach((element) => {
         allMessages.push(element);
       });
@@ -22,7 +21,7 @@ const app = () => {
       console.log(error.message);
     }
   }
-  getMessages();
+  getMessages(roomId);
 
   function renderMessages(messages, userId) {
     let messagesHtml = '';
@@ -84,7 +83,8 @@ const app = () => {
     contacts.forEach((contact) => {
       contact.addEventListener('click', function () {
         roomId = this.dataset.roomId;
-        getMessages();
+        allMessages.length = 0;
+        getMessages(roomId);
         joinRoom(roomId);
       });
     });

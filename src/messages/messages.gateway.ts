@@ -26,7 +26,7 @@ export class MessagesGateway {
       payload.userId,
       +payload.roomId,
     );
-    this.server.emit('recMessage', createdMessage);
+    this.server.to(`${payload.roomId}`).emit('recMessage', createdMessage);
   }
 
   @SubscribeMessage('joinRoom')

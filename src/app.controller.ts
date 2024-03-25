@@ -4,6 +4,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Render,
   Req,
   Res,
@@ -39,9 +40,12 @@ export class AppController {
   }
 
   @Get('/messages')
-  async getMessages(@Res() res: Response, @Req() req: Request) {
+  async getMessages(
+    @Query('roomId', ParseIntPipe) roomId: number,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
     const token = req.cookies.token;
-    const roomId = 12;
     const { id: userId } = await this.appService.verifyToken(token);
     const messages = await this.messagesService.read(roomId);
     res.json({ userId, messages });

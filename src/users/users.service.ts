@@ -13,7 +13,21 @@ export class UsersService {
   async findById(id: number): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { rooms: { include: { users: true } } },
+      include: {
+        rooms: {
+          include: {
+            rooms: {
+              include: {
+                users: {
+                  where: { userId: { not: id } },
+                  include: { users: true },
+                },
+                messages: { orderBy: { createdAt: 'desc' } },
+              },
+            },
+          },
+        },
+      },
     });
     return user;
   }
@@ -26,13 +40,19 @@ export class UsersService {
   async usersToAdd(userId: number): Promise<User[] | null> {
     const users = await this.prisma.user.findMany({
       where: {
-        NOT: {
-          id: userId,
+        id: {
+          not: userId,
         },
         rooms: {
-          none: {
-            users: {
-              id: userId,
+          every: {
+            rooms: {
+              users: {
+                every: {
+                  NOT: {
+                    userId: userId,
+                  },
+                },
+              },
             },
           },
         },

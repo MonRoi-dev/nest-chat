@@ -20,8 +20,8 @@
 						<span class="contact-status online"></span>
 						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
 						<div class="meta">
-							<p class="name"><%= room.users.username %><%= room.roomId %></p>
-							<p class="preview"></p>
+							<p class="name"><%= room.rooms.users[0].users.username %></p>
+							<p class="preview"><%= room.rooms.messages[0].content %></p>
 						</div>
 					</div>
 				</li>
