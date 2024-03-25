@@ -21,7 +21,11 @@
 						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
 						<div class="meta">
 							<p class="name"><%= room.rooms.users[0].users.username %></p>
-							<p class="preview"><%= room.rooms.messages[0].content %></p>
+							<% if(room.rooms.messages[0].userId === user?.id) {%>
+								<p class="preview">You: <%= room.rooms.messages[0].content %></p>
+							<% } else { %>
+								<p class="preview"><%= room.rooms.messages[0].content %></p>
+							<% } %>
 						</div>
 					</div>
 				</li>
@@ -38,12 +42,7 @@
 	<div class="content">
 		<div class="contact-profile">
 			<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-			<p>Harvey Specter</p>
-			<div class="social-media">
-				<i class="fa fa-facebook" aria-hidden="true"></i>
-				<i class="fa fa-twitter" aria-hidden="true"></i>
-				 <i class="fa fa-instagram" aria-hidden="true"></i>
-			</div>
+			<p class="username"> </p>
 		</div>
 		<div class="messages">
 			<ul class="messageList">

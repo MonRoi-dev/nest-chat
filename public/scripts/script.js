@@ -3,9 +3,13 @@ const app = () => {
   const msgInput = document.querySelector('.messageToSend');
   const msgList = document.querySelector('.messageList');
   const sendBtn = document.querySelector('#sendBtn');
+  const msgBody = document.querySelector('.messages');
+  const username = document.querySelector('.username');
+  const msgBar = document.querySelector('.message-input');
+  const contactBar = document.querySelector('.contact-profile');
   const allMessages = [];
   let userId;
-  let roomId;
+  let roomId = null;
 
   async function getMessages(roomId) {
     try {
@@ -18,6 +22,8 @@ const app = () => {
         allMessages.push(element);
       });
     } catch (error) {
+      msgBar.style.visibility = 'hidden';
+      contactBar.style.visibility = 'hidden';
       console.log(error.message);
     }
   }
@@ -25,11 +31,11 @@ const app = () => {
 
   function renderMessages(messages, userId) {
     let messagesHtml = '';
-
     if (!roomId) {
-      messages.innerHTML += `<h1>Select Room!</h1>`;
+      msgBody.innerHTML += `<div class="messages"><h1 style="color: black">Select Room!</h1></div>`;
       msgList.innerHTML = messagesHtml;
     } else {
+      username.innerHTML = `<p class="usernam">${messages[messages.length - 1].room.users[0].users.username}</p>`;
       messages.forEach((message) => {
         if (message.userId === userId) {
           messagesHtml += `<li class="sent">
@@ -46,6 +52,7 @@ const app = () => {
     }
 
     msgList.innerHTML = messagesHtml;
+    msgBody.scrollTop = msgBody.scrollHeight;
   }
 
   function handldeSendMesage(content) {
@@ -82,6 +89,8 @@ const app = () => {
 
     contacts.forEach((contact) => {
       contact.addEventListener('click', function () {
+        msgBar.style.visibility = 'visible';
+        contactBar.style.visibility = 'visible';
         roomId = this.dataset.roomId;
         allMessages.length = 0;
         getMessages(roomId);

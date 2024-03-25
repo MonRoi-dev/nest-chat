@@ -34,11 +34,6 @@ export class AppController {
     return { user, users };
   }
 
-  @Get('/profile')
-  async profile(@Res() res: Response) {
-    return res.json({ message: 'profile' });
-  }
-
   @Get('/messages')
   async getMessages(
     @Query('roomId', ParseIntPipe) roomId: number,
@@ -47,7 +42,7 @@ export class AppController {
   ) {
     const token = req.cookies.token;
     const { id: userId } = await this.appService.verifyToken(token);
-    const messages = await this.messagesService.read(roomId);
+    const messages = await this.messagesService.read(roomId, userId);
     res.json({ userId, messages });
   }
 

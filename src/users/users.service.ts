@@ -22,7 +22,7 @@ export class UsersService {
                   where: { userId: { not: id } },
                   include: { users: true },
                 },
-                messages: { orderBy: { createdAt: 'desc' } },
+                messages: { orderBy: { createdAt: 'desc' }, take: 1 },
               },
             },
           },

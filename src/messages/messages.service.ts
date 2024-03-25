@@ -20,7 +20,19 @@ export class MessagesService {
     });
   }
 
-  async read(roomId: number): Promise<Message[] | null> {
-    return await this.prismaService.message.findMany({ where: { roomId } });
+  async read(roomId: number, userId: number): Promise<Message[] | null> {
+    return await this.prismaService.message.findMany({
+      where: { roomId },
+      include: {
+        room: {
+          include: {
+            users: {
+              where: { userId: { not: userId } },
+              include: { users: true },
+            },
+          },
+        },
+      },
+    });
   }
 }
