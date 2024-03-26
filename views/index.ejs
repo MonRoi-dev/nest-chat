@@ -1,5 +1,6 @@
 <%- include('partials/head') %>
 <body>
+	<% if(user) {%>
 <div id="frame">
 	<div id="sidepanel">
 		<div id="profile">
@@ -50,7 +51,7 @@
 		</div>
 		<div class="message-input">
 			<div class="wrap">
-			<input class="messageToSend" type="content" placeholder="Write your message..." />
+			<input class="messageToSend" type="content" placeholder="Write your message..."/>
             <label for="input__file_att">
                 <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
              <input type="file" id="input__file_att" accept=".jpg, .jpeg, .png">
@@ -61,5 +62,6 @@
 		</div>
 	</div>
 </div>
+<% } %>
 <%- include('partials/scripts') %>
 </body></html>

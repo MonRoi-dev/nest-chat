@@ -13,18 +13,20 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user: User = await this.userService.findByEmail(email);
-    const pass = await bcrypt.compare(password, user.password);
-    if (user && pass) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...data } = user;
-      return data;
+    if (!user) {
+      throw new HttpException('Invalid Email', HttpStatus.UNAUTHORIZED);
     }
-    return null;
+    const pass = await bcrypt.compare(password, user.password);
+    if (!pass) {
+      throw new HttpException('Invalid Password', HttpStatus.UNAUTHORIZED);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: userPass, ...data } = user;
+    return data;
   }
 
   async register(data: Prisma.UserCreateInput) {
     const user: User = await this.userService.findByEmail(data.email);
-    console.log(data.email);
     if (user) {
       throw new HttpException(
         'User with that email already exist',

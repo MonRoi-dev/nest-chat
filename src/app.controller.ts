@@ -13,6 +13,7 @@ import { AppService } from './app.service';
 import { Response, Request } from 'express';
 import { MessagesService } from './messages/messages.service';
 import { UsersService } from './users/users.service';
+import { RoomsService } from './rooms/rooms.service';
 
 @Controller()
 export class AppController {
@@ -20,6 +21,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly messagesService: MessagesService,
     private readonly usersService: UsersService,
+    private readonly roomsServise: RoomsService,
   ) {}
 
   @Get()
@@ -28,10 +30,11 @@ export class AppController {
     const token = req.cookies.token;
     if (!token) {
       return res.redirect('/auth');
+    } else {
+      const user = await this.appService.verifyToken(token);
+      const users = await this.usersService.usersToAdd(user.id);
+      return { user, users };
     }
-    const user = await this.appService.verifyToken(token);
-    const users = await this.usersService.usersToAdd(user.id);
-    return { user, users };
   }
 
   @Get('/messages')
@@ -42,7 +45,7 @@ export class AppController {
   ) {
     const token = req.cookies.token;
     const { id: userId } = await this.appService.verifyToken(token);
-    const messages = await this.messagesService.read(roomId, userId);
+    const messages = await this.messagesService.read(roomId);
     res.json({ userId, messages });
   }
 
@@ -62,7 +65,7 @@ export class AppController {
   ) {
     const token = req.cookies.token;
     const { id: userId } = await this.appService.verifyToken(token);
-    await this.usersService.createRoom(userId, id);
+    await this.roomsServise.createRoom(userId, id);
     return res.redirect('/');
   }
 }

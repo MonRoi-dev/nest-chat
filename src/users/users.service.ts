@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Room, User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -29,6 +29,11 @@ export class UsersService {
         },
       },
     });
+    user.rooms.sort(
+      (a, b) =>
+        new Date(b.rooms.messages[0].createdAt).getTime() -
+        new Date(a.rooms.messages[0].createdAt).getTime(),
+    );
     return user;
   }
 
@@ -37,7 +42,7 @@ export class UsersService {
     return user;
   }
 
-  async usersToAdd(userId: number): Promise<User[] | null> {
+  async usersToAdd(userId: number): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       where: {
         id: {
@@ -59,19 +64,5 @@ export class UsersService {
       },
     });
     return users;
-  }
-
-  async createRoom(firstId: number, secondId: number): Promise<Room> {
-    const room = await this.prisma.room.create({
-      data: {
-        users: {
-          create: [
-            { users: { connect: { id: firstId } } },
-            { users: { connect: { id: secondId } } },
-          ],
-        },
-      },
-    });
-    return room;
   }
 }

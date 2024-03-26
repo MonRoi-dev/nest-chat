@@ -9,7 +9,12 @@ const app = () => {
   const contactBar = document.querySelector('.contact-profile');
   const allMessages = [];
   let userId;
-  let roomId = null;
+  let roomId;
+
+  if (!roomId) {
+    msgBar.style.visibility = 'hidden';
+    contactBar.style.visibility = 'hidden';
+  }
 
   async function getMessages(roomId) {
     try {
@@ -21,35 +26,27 @@ const app = () => {
       data.messages.forEach((element) => {
         allMessages.push(element);
       });
+      return userId;
     } catch (error) {
-      msgBar.style.visibility = 'hidden';
-      contactBar.style.visibility = 'hidden';
       console.log(error.message);
     }
   }
-  getMessages(roomId);
 
   function renderMessages(messages, userId) {
     let messagesHtml = '';
-    if (!roomId) {
-      msgBody.innerHTML += `<div class="messages"><h1 style="color: black">Select Room!</h1></div>`;
-      msgList.innerHTML = messagesHtml;
-    } else {
-      username.innerHTML = `<p class="usernam">${messages[messages.length - 1].room.users[0].users.username}</p>`;
-      messages.forEach((message) => {
-        if (message.userId === userId) {
-          messagesHtml += `<li class="sent">
+    messages.forEach((message) => {
+      if (message.userId === userId) {
+        messagesHtml += `<li class="sent">
           <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
           <p>${message.content}</p>
         </li>`;
-        } else {
-          messagesHtml += `<li class="replies">
+      } else {
+        messagesHtml += `<li class="replies">
           <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
           <p>${message.content}</p>
         </li>`;
-        }
-      });
-    }
+      }
+    });
 
     msgList.innerHTML = messagesHtml;
     msgBody.scrollTop = msgBody.scrollHeight;
@@ -80,23 +77,32 @@ const app = () => {
     renderMessages(allMessages, userId);
   });
 
-  function joinRoom(roomId) {
-    socket.emit('joinRoom', roomId);
+  function joinRoom(roomId, userId) {
+    const payload = {
+      roomId,
+      userId,
+    };
+    socket.emit('joinRoom', payload);
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     const contacts = document.querySelectorAll('.contact');
 
     contacts.forEach((contact) => {
-      contact.addEventListener('click', function () {
+      contact.addEventListener('click', async function () {
         msgBar.style.visibility = 'visible';
         contactBar.style.visibility = 'visible';
         roomId = this.dataset.roomId;
         allMessages.length = 0;
-        getMessages(roomId);
-        joinRoom(roomId);
+        const userId = await getMessages(roomId);
+        joinRoom(roomId, userId);
       });
     });
+  });
+
+  socket.on('roomJoining', (room) => {
+    console.log(room.users);
+    username.textContent = room.users[0].users.username;
   });
 };
 

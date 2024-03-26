@@ -7,10 +7,14 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
+import { RoomsService } from 'src/rooms/rooms.service';
 
 @WebSocketGateway()
 export class MessagesGateway {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly roomsService: RoomsService,
+  ) {}
 
   @WebSocketServer() server: Server;
 
@@ -30,7 +34,15 @@ export class MessagesGateway {
   }
 
   @SubscribeMessage('joinRoom')
-  joinRoom(socket: Socket, roomId: string) {
-    socket.join(roomId);
+  async joinRoom(
+    socket: Socket,
+    payload: { roomId: string; userId: number },
+  ): Promise<void> {
+    socket.join(payload.roomId);
+    const room = await this.roomsService.getRoomById(
+      +payload.roomId,
+      payload.userId,
+    );
+    this.server.to(payload.roomId).emit('roomJoining', room);
   }
 }

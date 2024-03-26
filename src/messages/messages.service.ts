@@ -4,14 +4,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MessagesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(
     content: string,
     userId: number,
     roomId: number,
   ): Promise<Message> {
-    return await this.prismaService.message.create({
+    return await this.prisma.message.create({
       data: {
         content,
         user: { connect: { id: userId } },
@@ -20,19 +20,9 @@ export class MessagesService {
     });
   }
 
-  async read(roomId: number, userId: number): Promise<Message[] | null> {
-    return await this.prismaService.message.findMany({
+  async read(roomId: number): Promise<Message[]> {
+    return await this.prisma.message.findMany({
       where: { roomId },
-      include: {
-        room: {
-          include: {
-            users: {
-              where: { userId: { not: userId } },
-              include: { users: true },
-            },
-          },
-        },
-      },
     });
   }
 }

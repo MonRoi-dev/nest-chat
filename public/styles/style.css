@@ -829,3 +829,21 @@ body.modal-open,
   border-radius: 4px;
 }
 
+.modal-body__main ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.modal-body__main ul form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 340px;
+}
+
+.modal-body__main ul form h4 {
+  padding-right: 20px;
+}
+
