@@ -35,16 +35,18 @@ const app = () => {
   function renderMessages(messages, userId) {
     let messagesHtml = '';
     messages.forEach((message) => {
-      if (message.userId === userId) {
-        messagesHtml += `<li class="sent">
+      if (message.roomId == roomId) {
+        if (message.userId === userId) {
+          messagesHtml += `<li class="sent">
           <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
           <p>${message.content}</p>
         </li>`;
-      } else {
-        messagesHtml += `<li class="replies">
+        } else {
+          messagesHtml += `<li class="replies">
           <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
           <p>${message.content}</p>
         </li>`;
+        }
       }
     });
 
@@ -101,8 +103,44 @@ const app = () => {
   });
 
   socket.on('roomJoining', (room) => {
-    console.log(room.users);
     username.textContent = room.users[0].users.username;
+  });
+
+  let typing = false;
+  let timeout = undefined;
+
+  function timeoutFunction() {
+    typing = false;
+    socket.emit('notTyping', roomId);
+  }
+
+  function onKeyDownNotEnter() {
+    if (typing == false) {
+      typing = true;
+      socket.emit('typing', roomId);
+      timeout = setTimeout(timeoutFunction, 1500);
+    } else {
+      clearTimeout(timeout);
+      timeout = setTimeout(timeoutFunction, 1500);
+    }
+  }
+
+  msgInput.addEventListener('input', () => {
+    onKeyDownNotEnter();
+  });
+
+  const typingText = document.createElement('p');
+  typingText.style.marginLeft = '3px';
+
+  socket.on('isTyping', (serverRoomId) => {
+    if (roomId === serverRoomId) {
+      typingText.textContent = 'typing...';
+      contactBar.appendChild(typingText);
+    }
+  });
+
+  socket.on('notTyping', () => {
+    contactBar = contactBar.removeChild(typingText);
   });
 };
 

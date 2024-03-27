@@ -22,10 +22,10 @@
 						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
 						<div class="meta">
 							<p class="name"><%= room.rooms.users[0].users.username %></p>
-							<% if(room.rooms.messages[0].userId === user?.id) {%>
-								<p class="preview">You: <%= room.rooms.messages[0].content %></p>
+							<% if(room.rooms.messages[0]?.userId === user.id) {%>
+								<p class="preview">You: <%= room.rooms.messages[0]?.content %></p>
 							<% } else { %>
-								<p class="preview"><%= room.rooms.messages[0].content %></p>
+								<p class="preview"><%= room.rooms.messages[0]?.content %></p>
 							<% } %>
 						</div>
 					</div>
@@ -43,7 +43,7 @@
 	<div class="content">
 		<div class="contact-profile">
 			<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-			<p class="username"> </p>
+			<p class="username"></p>
 		</div>
 		<div class="messages">
 			<ul class="messageList">

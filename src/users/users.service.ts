@@ -31,8 +31,8 @@ export class UsersService {
     });
     user.rooms.sort(
       (a, b) =>
-        new Date(b.rooms.messages[0].createdAt).getTime() -
-        new Date(a.rooms.messages[0].createdAt).getTime(),
+        new Date(b.rooms.messages[0]?.createdAt).getTime() -
+        new Date(a.rooms.messages[0]?.createdAt).getTime(),
     );
     return user;
   }

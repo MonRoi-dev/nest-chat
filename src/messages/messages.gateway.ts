@@ -30,7 +30,9 @@ export class MessagesGateway {
       payload.userId,
       +payload.roomId,
     );
-    this.server.to(`${payload.roomId}`).emit('recMessage', createdMessage);
+    this.server
+      .to(payload.roomId.toString())
+      .emit('recMessage', createdMessage);
   }
 
   @SubscribeMessage('joinRoom')
@@ -39,10 +41,22 @@ export class MessagesGateway {
     payload: { roomId: string; userId: number },
   ): Promise<void> {
     socket.join(payload.roomId);
+
     const room = await this.roomsService.getRoomById(
       +payload.roomId,
       payload.userId,
     );
-    this.server.to(payload.roomId).emit('roomJoining', room);
+    socket.emit('roomJoining', room);
+    socket.emit('notTyping');
+  }
+
+  @SubscribeMessage('typing')
+  async handleTyping(socket: Socket, roomId: number) {
+    socket.broadcast.to(roomId.toString()).emit('isTyping', roomId);
+  }
+
+  @SubscribeMessage('notTyping')
+  async handleNotTyping(socket: Socket, roomId: number) {
+    socket.broadcast.to(roomId.toString()).emit('notTyping');
   }
 }
