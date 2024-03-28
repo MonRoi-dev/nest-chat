@@ -50,4 +50,41 @@
   </div>
 </div>
 <%- include('partials/scripts') %>
+<script>
+  const form = document.querySelector('.modal__form'),
+    signBtn = document.querySelectorAll('.btn__signin'),
+    input = document.querySelector('.regist__name'),
+    modalTitle = document.querySelector('.modal__title');
+
+  let changeState = true;
+
+  signBtn.forEach((el) => {
+    el.addEventListener('click', (evt) => {
+      evt.preventDefault();
+
+      if (changeState) {
+        changeState = false;
+        form.setAttribute('action', '/auth/login');
+        modalTitle.textContent = 'Log In';
+        el.textContent = 'Sign Up';
+      } else {
+        changeState = true;
+        form.setAttribute('action', '/auth/register');
+        modalTitle.textContent = 'Register';
+        el.textContent = 'Sign In';
+      }
+      isStateChanged();
+    });
+  });
+
+  function isStateChanged() {
+    if (changeState) {
+      input.style.display = 'block';
+      input.setAttribute('required');
+    } else {
+      input.style.display = 'none';
+      input.removeAttribute('required');
+    }
+  }
+</script>
 

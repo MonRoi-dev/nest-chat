@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -64,5 +64,25 @@ export class UsersService {
       },
     });
     return users;
+  }
+
+  async updateUser(
+    id: number,
+    data: Prisma.UserUpdateInput,
+    image?: string,
+  ): Promise<User | null> {
+    if (!image) {
+      delete data.image;
+    } else {
+      data.image = image;
+    }
+    const user = await this.prisma.user.update({
+      where: { id },
+      data,
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 }

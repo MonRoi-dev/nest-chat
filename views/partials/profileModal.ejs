@@ -14,7 +14,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <form class="modal-conten__form" action="#" style="width: 100%">
-          <button type="button" class="modal__btn btn__signin">Edit</button>
+          <button
+            type="button"
+            class="modal__btn btn__signin"
+            data-toggle="modal"
+            data-target="#updateModal"
+          >
+            Edit
+          </button>
         </form>
         <button
           type="button"
@@ -29,7 +36,7 @@
         <div class="modal__img">
           <img
             class="modal__profile-img"
-            src="http://emilcarlsson.se/assets/louislitt.png"
+            src="/images/<%= user.image %>"
             alt=""
           />
         </div>

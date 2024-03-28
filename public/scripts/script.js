@@ -7,6 +7,7 @@ const app = () => {
   const username = document.querySelector('.username');
   const msgBar = document.querySelector('.message-input');
   const contactBar = document.querySelector('.contact-profile');
+  const avatar = document.querySelector('.avatar');
   const allMessages = [];
   let userId;
   let roomId;
@@ -38,12 +39,10 @@ const app = () => {
       if (message.roomId == roomId) {
         if (message.userId === userId) {
           messagesHtml += `<li class="sent">
-          <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
           <p>${message.content}</p>
         </li>`;
         } else {
           messagesHtml += `<li class="replies">
-          <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
           <p>${message.content}</p>
         </li>`;
         }
@@ -104,6 +103,7 @@ const app = () => {
 
   socket.on('roomJoining', (room) => {
     username.textContent = room.users[0].users.username;
+    avatar.src = `/images/${room.users[0].users.image}`;
   });
 
   let typing = false;

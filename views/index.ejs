@@ -5,7 +5,7 @@
 	<div id="sidepanel">
 		<div id="profile">
 			<div class="wrap">
-				<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
+				<img id="profile-img" src="/images/<%= user.image %>" class="online" alt="" />
 				<p><%= user.username %></p>
 			</div>
 		</div>
@@ -15,11 +15,11 @@
 		</div>
 		<div id="contacts">
 			<ul>
-				<% user.rooms.forEach((room) => {%>
+				<% user.rooms.forEach((room) => { %>
 				<li class="contact" data-room-id="<%= room.roomId %>">
 					<div class="wrap">
 						<span class="contact-status online"></span>
-						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+						<img src="/images/<%= room.rooms.users[0].users.image %>" alt="" />
 						<div class="meta">
 							<p class="name"><%= room.rooms.users[0].users.username %></p>
 							<% if(room.rooms.messages[0]?.userId === user.id) {%>
@@ -38,11 +38,12 @@
 			<%- include('partials/contactModal') %>
 			<button id="settings" type="button" class="btn btn-primary" data-toggle="modal" data-target="#profileModal"><span>Profile</span></button>
 			<%- include('partials/profileModal') %>
+			<%- include('partials/updateModal') %>
 		</div>
 	</div>
 	<div class="content">
 		<div class="contact-profile">
-			<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+			<img src="" class="avatar" alt="" />
 			<p class="username"></p>
 		</div>
 		<div class="messages">
@@ -62,6 +63,8 @@
 		</div>
 	</div>
 </div>
+<% }else{ %>
+	<a href="/auth">Login</a>
 <% } %>
 <%- include('partials/scripts') %>
 </body></html>
