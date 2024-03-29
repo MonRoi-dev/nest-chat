@@ -11,9 +11,9 @@ import {
   Req,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AppService } from './app.service';
 import { Response, Request } from 'express';
 import { MessagesService } from './messages/messages.service';
 import { UsersService } from './users/users.service';
@@ -23,11 +23,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as crypto from 'crypto';
 import * as mime from 'mime';
+import { AuthGuard } from './auth/auth.guard';
+import { AuthService } from './auth/auth.service';
 
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
+    private readonly authService: AuthService,
     private readonly messagesService: MessagesService,
     private readonly usersService: UsersService,
     private readonly roomsServise: RoomsService,
@@ -38,14 +40,15 @@ export class AppController {
   async main(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies.token;
     if (!token) {
-      return res.redirect('/auth');
+      return res.status(401).redirect('/auth');
     } else {
-      const user = await this.appService.verifyToken(token);
+      const user = await this.authService.verifyToken(token);
       const users = await this.usersService.usersToAdd(user.id);
       return { user, users };
     }
   }
 
+  @UseGuards(AuthGuard)
   @Get('/messages')
   async getMessages(
     @Query('roomId', ParseIntPipe) roomId: number,
@@ -53,19 +56,21 @@ export class AppController {
     @Req() req: Request,
   ) {
     const token = req.cookies.token;
-    const { id: userId } = await this.appService.verifyToken(token);
+    const { id: userId } = await this.authService.verifyToken(token);
     const messages = await this.messagesService.read(roomId);
     res.json({ userId, messages });
   }
 
+  @UseGuards(AuthGuard)
   @Get('/contacts')
   async getContacts(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies.token;
-    const { id: userId } = await this.appService.verifyToken(token);
+    const { id: userId } = await this.authService.verifyToken(token);
     const users = await this.usersService.usersToAdd(userId);
     res.json({ users });
   }
 
+  @UseGuards(AuthGuard)
   @Post('/contacts/:id')
   async addContact(
     @Param('id', ParseIntPipe) id: number,
@@ -73,11 +78,12 @@ export class AppController {
     @Res() res: Response,
   ) {
     const token = req.cookies.token;
-    const { id: userId } = await this.appService.verifyToken(token);
+    const { id: userId } = await this.authService.verifyToken(token);
     await this.roomsServise.createRoom(userId, id);
     return res.redirect('/');
   }
 
+  @UseGuards(AuthGuard)
   @Patch('/user')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -99,7 +105,7 @@ export class AppController {
     image?: Express.Multer.File,
   ): Promise<void> {
     const token = req.cookies.token;
-    const { id: userId } = await this.appService.verifyToken(token);
+    const { id: userId } = await this.authService.verifyToken(token);
     await this.usersService.updateUser(userId, data, image?.filename);
   }
 }

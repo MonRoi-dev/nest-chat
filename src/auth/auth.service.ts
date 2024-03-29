@@ -7,18 +7,21 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
   async validateUser(email: string, password: string) {
-    const user: User = await this.userService.findByEmail(email);
+    const user: User = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new HttpException('Invalid Email', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        `User with email: ${email} not found`,
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     const pass = await bcrypt.compare(password, user.password);
     if (!pass) {
-      throw new HttpException('Invalid Password', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Wrond password', HttpStatus.UNAUTHORIZED);
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: userPass, ...data } = user;
@@ -26,7 +29,7 @@ export class AuthService {
   }
 
   async register(data: Prisma.UserCreateInput) {
-    const user: User = await this.userService.findByEmail(data.email);
+    const user: User = await this.usersService.findByEmail(data.email);
     if (user) {
       throw new HttpException(
         'User with that email already exist',
@@ -34,7 +37,7 @@ export class AuthService {
       );
     }
     const password = await bcrypt.hash(data.password, 4);
-    const createdUser: User = await this.userService.create({
+    const createdUser: User = await this.usersService.create({
       ...data,
       password,
     });
@@ -42,12 +45,18 @@ export class AuthService {
   }
 
   async login(data: Prisma.UserUncheckedCreateWithoutMessagesInput) {
-    const user = await this.userService.findByEmail(data.email);
+    const user = await this.usersService.findByEmail(data.email);
     const payload: { id: number; email: string; username: string } = {
       id: user.id,
       email: user.email,
       username: user.username,
     };
     return await this.jwtService.signAsync(payload);
+  }
+
+  async verifyToken(token: string): Promise<User> {
+    const tokenData = await this.jwtService.verifyAsync(token);
+    const userData = await this.usersService.findById(tokenData.id);
+    return userData;
   }
 }
