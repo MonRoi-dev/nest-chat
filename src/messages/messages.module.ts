@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from 'src/database/prisma.module';
 import { MessagesGateway } from './messages.gateway';
 import { RoomsModule } from 'src/rooms/rooms.module';
 import { UsersModule } from 'src/users/users.module';

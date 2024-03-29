@@ -14,7 +14,7 @@ import { UsersService } from 'src/users/users.service';
 import { AuthService } from 'src/auth/auth.service';
 import * as cookie from 'cookie';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class MessagesGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
