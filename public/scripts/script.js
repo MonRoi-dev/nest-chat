@@ -142,6 +142,16 @@ const app = () => {
   socket.on('notTyping', () => {
     contactBar = contactBar.removeChild(typingText);
   });
+
+  const imageStatus = document.querySelector('#profile-img');
+
+  socket.on('connect', () => {
+    imageStatus.className = 'online';
+  });
+
+  socket.on('disconnect', () => {
+    imageStatus.className = 'offline';
+  });
 };
 
 app();

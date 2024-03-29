@@ -85,4 +85,8 @@ export class UsersService {
     }
     return user;
   }
+
+  async updateSocket(id: number, socketId: string): Promise<void> {
+    await this.prisma.user.update({ where: { id }, data: { socketId } });
+  }
 }

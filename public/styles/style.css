@@ -109,15 +109,17 @@ body {
 #frame #sidepanel #profile .wrap img.online {
   border: 2px solid #2ecc71;
 }
-#frame #sidepanel #profile .wrap img.away {
-  border: 2px solid #f1c40f;
-}
-#frame #sidepanel #profile .wrap img.busy {
-  border: 2px solid #e74c3c;
-}
 #frame #sidepanel #profile .wrap img.offline {
   border: 2px solid #95a5a6;
 }
+
+#frame .content .contact-profile img.avatar.online {
+  border: 2px solid #2ecc71;
+}
+#frame .content .contact-profile img.avatar.offline {
+  border: 2px solid #95a5a6;
+}
+
 #frame #sidepanel #profile .wrap p {
   float: left;
   margin-left: 15px;

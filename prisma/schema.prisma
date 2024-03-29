@@ -18,9 +18,10 @@ model User {
   username      String      @db.VarChar(32)
   email         String      @unique @db.VarChar(32)
   password      String      
-  image         String?     @default("imageNotFound.jpg")
+  image         String     @default("imageNotFound.jpg")
   rooms         UserRooms[]    
   messages      Message[]   
+  socketId      String?     @db.VarChar(32)
   createdAt     DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime    @updatedAt  @db.Timestamptz(3)
 }

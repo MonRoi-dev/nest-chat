@@ -18,7 +18,7 @@
 				<% user.rooms.forEach((room) => { %>
 				<li class="contact" data-room-id="<%= room.roomId %>">
 					<div class="wrap">
-						<span class="contact-status online"></span>
+						<span class="<%= room.rooms.users[0].users.socketId ? 'contact-status online' : 'contact-status' %>"></span>
 						<img src="/images/<%= room.rooms.users[0].users.image %>" alt="" />
 						<div class="meta">
 							<p class="name"><%= room.rooms.users[0].users.username %></p>

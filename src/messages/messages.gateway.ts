@@ -2,18 +2,27 @@ import {
   ConnectedSocket,
   MessageBody,
   SubscribeMessage,
+  OnGatewayDisconnect,
+  OnGatewayConnection,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { UsersService } from 'src/users/users.service';
+import { AuthService } from 'src/auth/auth.service';
+import * as cookie from 'cookie';
 
 @WebSocketGateway()
-export class MessagesGateway {
+export class MessagesGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(
     private readonly messagesService: MessagesService,
     private readonly roomsService: RoomsService,
+    private readonly usersServise: UsersService,
+    private readonly authServise: AuthService,
   ) {}
 
   @WebSocketServer() server: Server;
@@ -58,5 +67,25 @@ export class MessagesGateway {
   @SubscribeMessage('notTyping')
   async handleNotTyping(socket: Socket, roomId: number) {
     socket.broadcast.to(roomId.toString()).emit('notTyping');
+  }
+
+  async handleConnection(client: Socket) {
+    client.emit('connected');
+    const cookies = client.handshake.headers.cookie;
+    if (cookies) {
+      const { token } = cookie.parse(client.handshake.headers.cookie);
+      const { id } = await this.authServise.verifyToken(token);
+      await this.usersServise.updateSocket(id, client.id);
+    }
+  }
+
+  async handleDisconnect(client: Socket) {
+    client.emit('disconnected');
+    const cookies = client.handshake.headers.cookie;
+    if (cookies) {
+      const { token } = cookie.parse(client.handshake.headers.cookie);
+      const { id } = await this.authServise.verifyToken(token);
+      await this.usersServise.updateSocket(id, '');
+    }
   }
 }
