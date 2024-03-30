@@ -766,7 +766,6 @@ body {
 }
 
 .modal__btn-close {
-  /* background-color: red !important; */
   opacity: 1;
   margin: 0 !important;
 }
@@ -849,3 +848,22 @@ body.modal-open,
   padding-right: 20px;
 }
 
+.timeSent {
+  display: block;
+  font-size: 0.6rem;
+  color: white;
+  text-align: left;
+}
+.timeReplied {
+  display: block;
+  font-size: 0.6rem;
+  color: black;
+  text-align: right;
+}
+
+.timeRoom {
+  display: block;
+  font-size: 0.6rem;
+  color: white;
+  text-align: right;
+}

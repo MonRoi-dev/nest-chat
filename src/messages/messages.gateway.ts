@@ -60,16 +60,16 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('typing')
-  async handleTyping(socket: Socket, roomId: number) {
+  async handleTyping(socket: Socket, roomId: number): Promise<void> {
     socket.broadcast.to(roomId.toString()).emit('isTyping', roomId);
   }
 
   @SubscribeMessage('notTyping')
-  async handleNotTyping(socket: Socket, roomId: number) {
+  async handleNotTyping(socket: Socket, roomId: number): Promise<void> {
     socket.broadcast.to(roomId.toString()).emit('notTyping');
   }
 
-  async handleConnection(client: Socket) {
+  async handleConnection(client: Socket): Promise<void> {
     client.emit('connected');
     const cookies = client.handshake.headers.cookie;
     if (cookies) {
@@ -79,7 +79,7 @@ export class MessagesGateway
     }
   }
 
-  async handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket): Promise<void> {
     client.emit('disconnected');
     const cookies = client.handshake.headers.cookie;
     if (cookies) {

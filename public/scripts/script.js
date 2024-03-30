@@ -36,14 +36,23 @@ const app = () => {
   function renderMessages(messages, userId) {
     let messagesHtml = '';
     messages.forEach((message) => {
+      let time = new Date(message.createdAt).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
       if (message.roomId == roomId) {
         if (message.userId === userId) {
           messagesHtml += `<li class="sent">
-          <p>${message.content}</p>
+          <p>${message.content}
+            <label class="timeSent">${time}</label>
+          </p>
+          
         </li>`;
         } else {
           messagesHtml += `<li class="replies">
-          <p>${message.content}</p>
+          <p>${message.content}
+            <label class="timeReplied">${time}</label>
+          </p>
         </li>`;
         }
       }

@@ -1,5 +1,6 @@
 <%- include('partials/head') %>
 <body>
+	<% if(token) {%>
 <div id="frame">
 	<div id="sidepanel">
 		<div id="profile">
@@ -23,8 +24,16 @@
 							<p class="name"><%= room.rooms.users[0].users.username %></p>
 							<% if(room.rooms.messages[0]?.userId === user.id) {%>
 								<p class="preview">You: <%= room.rooms.messages[0]?.content %></p>
+								<p class="timeRoom"><%= new Date(room.rooms.messages[0]?.createdAt).toLocaleTimeString([], {
+									hour: '2-digit',
+									minute: '2-digit',
+								  }); %></p>
 							<% } else { %>
 								<p class="preview"><%= room.rooms.messages[0]?.content %></p>
+								<p class="timeRoom"><%= new Date(room.rooms.messages[0]?.createdAt).toLocaleTimeString([], {
+									hour: '2-digit',
+									minute: '2-digit',
+								  }); %></p>
 							<% } %>
 						</div>
 					</div>
@@ -62,5 +71,6 @@
 		</div>
 	</div>
 </div>
+<% } %>
 <%- include('partials/scripts') %>
 </body></html>
