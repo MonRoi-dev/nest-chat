@@ -15,7 +15,11 @@
 		</div>
 		<div id="contacts">
 			<ul>
-				<% user.rooms.forEach((room) => { %>
+				<% user.rooms.sort(
+					(a, b) =>
+					  new Date(b.rooms.messages[0]?.createdAt).getTime() -
+					  new Date(a.rooms.messages[0]?.createdAt).getTime(),
+				  ).forEach((room) => { %>
 				<li class="contact" data-room-id="<%= room.roomId %>">
 					<div class="wrap">
 						<span class="<%= room.rooms.users[0].users.socketId ? 'contact-status online' : 'contact-status' %>"></span>
@@ -23,13 +27,21 @@
 						<div class="meta">
 							<p class="name"><%= room.rooms.users[0].users.username %></p>
 							<% if(room.rooms.messages[0]?.userId === user.id) {%>
-								<p class="preview">You: <%= room.rooms.messages[0]?.content %></p>
+								<% if(room.rooms.messages[0]?.isImage) {%>
+									<p class="preview">You: image</p>
+								<% } else { %>
+									<p class="preview">You: <%= room.rooms.messages[0]?.content %></p>
+								<% } %>
 								<p class="timeRoom"><%= new Date(room.rooms.messages[0]?.createdAt).toLocaleTimeString([], {
 									hour: '2-digit',
 									minute: '2-digit',
 								  }); %></p>
 							<% } else { %>
-								<p class="preview"><%= room.rooms.messages[0]?.content %></p>
+								<% if(room.rooms.messages[0]?.isImage) {%>
+									<p class="preview">image</p>
+								<%} else {%>
+									<p class="preview"><%= room.rooms.messages[0]?.content %></p>
+								<% } %>
 								<p class="timeRoom"><%= new Date(room.rooms.messages[0]?.createdAt).toLocaleTimeString([], {
 									hour: '2-digit',
 									minute: '2-digit',

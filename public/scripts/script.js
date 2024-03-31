@@ -11,10 +11,11 @@ const app = () => {
   const allMessages = [];
   let userId;
   let roomId;
+  let toEdit;
 
   if (!roomId) {
-    msgBar.style.visibility = 'hidden';
-    contactBar.style.visibility = 'hidden';
+    msgBar.style.display = 'none';
+    contactBar.style.display = 'none';
   }
 
   async function getMessages(roomId) {
@@ -42,16 +43,19 @@ const app = () => {
       });
       if (message.roomId == roomId) {
         if (message.userId === userId) {
+          messagesHtml += `<li id="${message.id}" class="replies">
+          <p><span class="text">${message.content}</span>
+            <label class="timeReplied">${time}</label>
+          </p>
+          <div class="option__buttons">
+            <i class="bi bi-trash-fill"></i>
+            <i class="bi bi-pencil-fill"></i>
+          </div>
+        </li>`;
+        } else {
           messagesHtml += `<li class="sent">
           <p>${message.content}
             <label class="timeSent">${time}</label>
-          </p>
-          
-        </li>`;
-        } else {
-          messagesHtml += `<li class="replies">
-          <p>${message.content}
-            <label class="timeReplied">${time}</label>
           </p>
         </li>`;
         }
@@ -62,7 +66,7 @@ const app = () => {
     msgBody.scrollTop = msgBody.scrollHeight;
   }
 
-  function handldeSendMesage(content) {
+  function handleSendMesage(content) {
     if (!content.trim()) {
       return;
     } else {
@@ -71,12 +75,27 @@ const app = () => {
     }
   }
 
-  msgInput.addEventListener(
-    'keydown',
-    (e) => e.keyCode === 13 && handldeSendMesage(e.target.value),
-  );
+  function handleEditMesage(content) {
+    if (!content.trim()) {
+      return;
+    } else {
+      editMessage({ content, toEdit });
+      toEdit = '';
+      msgInput.value = '';
+    }
+  }
 
-  sendBtn.addEventListener('click', () => handldeSendMesage(msgInput.value));
+  // msgInput.addEventListener('keydown', (e) => {
+  //   e.keyCode === 13 && toEdit
+  //     ? handleEditMesage(e.target.value)
+  //     : handleSendMesage(e.target.value);
+  // });
+
+  sendBtn.addEventListener('click', () => {
+    toEdit
+      ? handleEditMesage(msgInput.value)
+      : handleSendMesage(msgInput.value);
+  });
 
   function sendMessage(payload) {
     socket.emit('sendMessage', payload);
@@ -100,12 +119,13 @@ const app = () => {
 
     contacts.forEach((contact) => {
       contact.addEventListener('click', async function () {
-        msgBar.style.visibility = 'visible';
-        contactBar.style.visibility = 'visible';
+        msgBar.style.display = 'block';
+        contactBar.style.display = 'block';
         roomId = this.dataset.roomId;
         allMessages.length = 0;
         const userId = await getMessages(roomId);
         joinRoom(roomId, userId);
+        messagesOptions();
       });
     });
   });
@@ -144,12 +164,15 @@ const app = () => {
   socket.on('isTyping', (serverRoomId) => {
     if (roomId === serverRoomId) {
       typingText.textContent = 'typing...';
+      typingText.className = 'typingText';
       contactBar.appendChild(typingText);
     }
   });
 
   socket.on('notTyping', () => {
-    contactBar = contactBar.removeChild(typingText);
+    if (contactBar.querySelector('.typingText')) {
+      contactBar = contactBar.removeChild(typingText);
+    }
   });
 
   const imageStatus = document.querySelector('#profile-img');
@@ -161,6 +184,38 @@ const app = () => {
   socket.on('disconnect', () => {
     imageStatus.className = 'offline';
   });
+
+  function messagesOptions() {
+    const options = document.querySelectorAll('.option__buttons');
+    const newDiv = document.createElement('div');
+
+    options.forEach((btn) => {
+      btn.querySelector('.bi-pencil-fill').addEventListener('click', () => {
+        newDiv.className = 'messageToEdit';
+        newDiv.innerHTML = btn.parentElement.innerHTML;
+        msgInput.parentNode.insertBefore(newDiv, msgInput);
+        toEdit = btn.parentElement;
+      });
+
+      btn.querySelector('.bi-trash-fill').addEventListener('click', () => {
+        deleteMessage(btn.parentElement);
+      });
+    });
+  }
+
+  function editMessage(payload) {
+    const message = allMessages.find((msg) => msg.id == payload.toEdit.id);
+    const edited = toEdit.querySelector('.text');
+    edited.textContent = payload.content;
+    message.content = payload.content;
+    socket.emit('editMessage', message);
+  }
+
+  function deleteMessage(messageToDelete) {
+    const message = allMessages.find((msg) => msg.id == messageToDelete.id);
+    socket.emit('deleteMessage', message);
+    messageToDelete.remove();
+  }
 };
 
 app();

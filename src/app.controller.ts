@@ -57,7 +57,7 @@ export class AppController {
   ) {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
-    const messages = await this.messagesService.read(roomId);
+    const messages = await this.messagesService.getMessages(roomId);
     res.json({ userId, messages });
   }
 

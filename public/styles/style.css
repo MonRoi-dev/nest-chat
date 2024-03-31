@@ -867,3 +867,17 @@ body.modal-open,
   color: white;
   text-align: right;
 }
+
+.option__buttons {
+  color: rgb(44, 62, 80);
+  font-size: 1.2rem;
+  display: none;
+}
+
+.replies:hover .option__buttons {
+  display: block;
+}
+
+.messageToEdit{
+  background-color: whitesmoke;
+}

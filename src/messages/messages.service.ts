@@ -1,28 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { Message } from '@prisma/client';
+import { Message, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class MessagesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
+  async createMessage(
     content: string,
     userId: number,
     roomId: number,
+    isImage: boolean = false,
   ): Promise<Message> {
     return await this.prisma.message.create({
       data: {
         content,
+        isImage,
         user: { connect: { id: userId } },
         room: { connect: { id: roomId } },
       },
     });
   }
 
-  async read(roomId: number): Promise<Message[]> {
+  async getMessages(roomId: number): Promise<Message[]> {
     return await this.prisma.message.findMany({
       where: { roomId },
+      orderBy: { createdAt: 'asc' },
     });
+  }
+
+  async editMessage(
+    id: number,
+    data: Prisma.MessageUpdateInput,
+  ): Promise<Message> {
+    return await this.prisma.message.update({ where: { id }, data });
+  }
+
+  async deleteMessage(id: number): Promise<Message> {
+    return await this.prisma.message.delete({ where: { id } });
   }
 }

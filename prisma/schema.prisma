@@ -18,7 +18,7 @@ model User {
   username      String      @db.VarChar(32)
   email         String      @unique @db.VarChar(32)
   password      String      
-  image         String     @default("imageNotFound.jpg")
+  image         String      @default("imageNotFound.jpg")
   rooms         UserRooms[]    
   messages      Message[]   
   socketId      String?     @db.VarChar(32)
@@ -44,6 +44,7 @@ model UserRooms {
 model Message {
   id            Int         @id @default(autoincrement())
   content       String      
+  isImage       Boolean     @default(false)
   userId        Int         
   user          User        @relation(fields: [userId], references: [id])
   roomId        Int         
