@@ -6,6 +6,7 @@ import {
   OnGatewayConnection,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
@@ -30,7 +31,6 @@ export class MessagesGateway
   ) {}
 
   @WebSocketServer() server: Server;
-
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @ConnectedSocket()
@@ -95,7 +95,9 @@ export class MessagesGateway
 
   @SubscribeMessage('joinRoom')
   async joinRoom(
+    @ConnectedSocket()
     socket: Socket,
+    @MessageBody()
     payload: { roomId: string; userId: number },
   ): Promise<void> {
     socket.join(payload.roomId);
@@ -103,21 +105,44 @@ export class MessagesGateway
       +payload.roomId,
       payload.userId,
     );
-    socket.emit('roomJoining', room);
-    socket.emit('notTyping');
+    if (room) {
+      socket.emit('roomJoining', room);
+      socket.emit('notTyping');
+    } else {
+      throw new WsException("Room doesn't exist");
+    }
+  }
+
+  @SubscribeMessage('leaveRoom')
+  leaveRoom(
+    @ConnectedSocket()
+    socket: Socket,
+    @MessageBody()
+    roomId: string,
+  ) {
+    const rooms = [...socket.rooms].filter((room: string) => room != roomId);
+    rooms.forEach((room) => {
+      socket.leave(room);
+    });
   }
 
   @SubscribeMessage('typing')
-  handleTyping(socket: Socket, roomId: number) {
-    socket.broadcast.to(roomId.toString()).emit('isTyping', roomId);
+  handleTyping(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomId: number,
+  ) {
+    socket.broadcast.to(roomId.toString()).emit('isTyping', socket.id);
   }
 
   @SubscribeMessage('notTyping')
-  handleNotTyping(socket: Socket, roomId: number) {
-    socket.broadcast.to(roomId.toString()).emit('notTyping');
+  handleNotTyping(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomId: number,
+  ) {
+    socket.broadcast.to(roomId.toString()).emit('notTyping', socket.id);
   }
 
-  async handleConnection(socket: Socket): Promise<boolean> {
+  async handleConnection(@ConnectedSocket() socket: Socket): Promise<boolean> {
     const cookies = socket.handshake.headers.cookie;
     if (cookies) {
       const { token } = cookie.parse(socket.handshake.headers.cookie);
@@ -127,7 +152,7 @@ export class MessagesGateway
     return socket.emit('connected');
   }
 
-  async handleDisconnect(socket: Socket): Promise<boolean> {
+  async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<boolean> {
     const cookies = socket.handshake.headers.cookie;
     if (cookies) {
       const { token } = cookie.parse(socket.handshake.headers.cookie);

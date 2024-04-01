@@ -42,10 +42,10 @@
 								<%} else {%>
 									<p class="preview"><%= room.rooms.messages[0]?.content %></p>
 								<% } %>
-								<p class="timeRoom"><%= new Date(room.rooms.messages[0]?.createdAt).toLocaleTimeString([], {
+								<p class="timeRoom"><%= room.rooms.messages[0]?.createdAt ? new Date(room.rooms.messages[0]?.createdAt).toLocaleTimeString([], {
 									hour: '2-digit',
 									minute: '2-digit',
-								  }); %></p>
+								  }) : '' %></p>
 							<% } %>
 						</div>
 					</div>

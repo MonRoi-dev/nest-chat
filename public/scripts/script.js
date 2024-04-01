@@ -80,16 +80,19 @@ const app = () => {
       return;
     } else {
       editMessage({ content, toEdit });
-      toEdit = '';
-      msgInput.value = '';
+      clearToEdit();
     }
   }
 
-  // msgInput.addEventListener('keydown', (e) => {
-  //   e.keyCode === 13 && toEdit
-  //     ? handleEditMesage(e.target.value)
-  //     : handleSendMesage(e.target.value);
-  // });
+  msgInput.addEventListener('keydown', (e) => {
+    if (e.keyCode === 13) {
+      toEdit
+        ? handleEditMesage(e.target.value)
+        : handleSendMesage(e.target.value);
+    } else if (e.keyCode === 27 && toEdit) {
+      clearToEdit();
+    }
+  });
 
   sendBtn.addEventListener('click', () => {
     toEdit
@@ -114,17 +117,23 @@ const app = () => {
     socket.emit('joinRoom', payload);
   }
 
+  function leaveRoom(roomId) {
+    socket.emit('leaveRoom', roomId);
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     const contacts = document.querySelectorAll('.contact');
 
     contacts.forEach((contact) => {
       contact.addEventListener('click', async function () {
+        clearToEdit();
         msgBar.style.display = 'block';
         contactBar.style.display = 'block';
         roomId = this.dataset.roomId;
         allMessages.length = 0;
         const userId = await getMessages(roomId);
         joinRoom(roomId, userId);
+        leaveRoom(roomId);
         messagesOptions();
       });
     });
@@ -161,8 +170,9 @@ const app = () => {
   const typingText = document.createElement('p');
   typingText.style.marginLeft = '3px';
 
-  socket.on('isTyping', (serverRoomId) => {
-    if (roomId === serverRoomId) {
+  socket.on('isTyping', (clientId) => {
+    if (clientId !== socket.id) {
+      console.log('hello, im not typing');
       typingText.textContent = 'typing...';
       typingText.className = 'typingText';
       contactBar.appendChild(typingText);
@@ -171,7 +181,7 @@ const app = () => {
 
   socket.on('notTyping', () => {
     if (contactBar.querySelector('.typingText')) {
-      contactBar = contactBar.removeChild(typingText);
+      contactBar.removeChild(typingText);
     }
   });
 
@@ -191,6 +201,8 @@ const app = () => {
 
     options.forEach((btn) => {
       btn.querySelector('.bi-pencil-fill').addEventListener('click', () => {
+        msgInput.value = '';
+        msgInput.focus();
         newDiv.className = 'messageToEdit';
         newDiv.innerHTML = btn.parentElement.innerHTML;
         msgInput.parentNode.insertBefore(newDiv, msgInput);
@@ -215,6 +227,14 @@ const app = () => {
     const message = allMessages.find((msg) => msg.id == messageToDelete.id);
     socket.emit('deleteMessage', message);
     messageToDelete.remove();
+  }
+
+  function clearToEdit() {
+    msgInput.value = '';
+    if (toEdit) {
+      document.querySelector('.messageToEdit').remove();
+      toEdit = '';
+    }
   }
 };
 

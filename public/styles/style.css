@@ -872,12 +872,20 @@ body.modal-open,
   color: rgb(44, 62, 80);
   font-size: 1.2rem;
   display: none;
+  float: right;
+  margin-top: 20px;
+  margin-right: 15px;
+}
+
+.option__buttons i {
+  margin-left: 5px;
+  cursor: pointer;
 }
 
 .replies:hover .option__buttons {
   display: block;
 }
 
-.messageToEdit{
+.messageToEdit {
   background-color: whitesmoke;
 }

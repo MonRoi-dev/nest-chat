@@ -8,7 +8,6 @@ import {
   Post,
   Query,
   Redirect,
-  Render,
   Req,
   Res,
   UploadedFile,
@@ -37,15 +36,14 @@ export class AppController {
   ) {}
 
   @Get('/')
-  @Render('index')
-  async main(@Req() req: Request, @Res() res: Response) {
+  async main(@Req() req: Request, @Res() res: Response): Promise<void> {
     const token = req.cookies.token;
     if (!token) {
       return res.status(401).redirect('/auth');
     } else {
       const user = await this.authService.verifyToken(token);
       const users = await this.usersService.usersToAdd(user.id);
-      return { user, users };
+      return res.render('index', { user, users });
     }
   }
 
