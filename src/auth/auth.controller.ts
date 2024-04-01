@@ -4,23 +4,25 @@ import {
   Body,
   Res,
   Redirect,
-  Render,
   Get,
-  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Prisma } from '@prisma/client';
-import { Response } from 'express';
-import { AuthGuard } from './auth.guard';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('/')
-  @Render('auth')
-  async getAuth(@Res() res: Response) {
-    return res.status(200);
+  async getAuth(@Req() req: Request, @Res() res: Response) {
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(200).render('auth');
+    } else {
+      return res.redirect('/');
+    }
   }
 
   @Post('login')
@@ -30,12 +32,10 @@ export class AuthController {
     res.cookie('token', token, { maxAge: 60 * 60 * 1000 * 24 });
   }
 
-  @UseGuards(AuthGuard)
   @Post('logout')
   @Redirect('/auth')
   async logout(@Res() res: Response) {
     res.clearCookie('token');
-    res.redirect('/auth');
   }
 
   @Post('register')

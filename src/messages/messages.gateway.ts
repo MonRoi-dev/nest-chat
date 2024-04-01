@@ -108,32 +108,32 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('typing')
-  async handleTyping(socket: Socket, roomId: number): Promise<void> {
+  handleTyping(socket: Socket, roomId: number) {
     socket.broadcast.to(roomId.toString()).emit('isTyping', roomId);
   }
 
   @SubscribeMessage('notTyping')
-  async handleNotTyping(socket: Socket, roomId: number): Promise<void> {
+  handleNotTyping(socket: Socket, roomId: number) {
     socket.broadcast.to(roomId.toString()).emit('notTyping');
   }
 
-  async handleConnection(socket: Socket): Promise<void> {
-    socket.emit('connected');
+  async handleConnection(socket: Socket): Promise<boolean> {
     const cookies = socket.handshake.headers.cookie;
     if (cookies) {
       const { token } = cookie.parse(socket.handshake.headers.cookie);
       const { id } = await this.authServise.verifyToken(token);
       await this.usersServise.updateSocket(id, socket.id);
     }
+    return socket.emit('connected');
   }
 
-  async handleDisconnect(socket: Socket): Promise<void> {
-    socket.emit('disconnected');
+  async handleDisconnect(socket: Socket): Promise<boolean> {
     const cookies = socket.handshake.headers.cookie;
     if (cookies) {
       const { token } = cookie.parse(socket.handshake.headers.cookie);
       const { id } = await this.authServise.verifyToken(token);
       await this.usersServise.updateSocket(id, '');
     }
+    return socket.emit('disconnected');
   }
 }

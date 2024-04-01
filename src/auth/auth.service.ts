@@ -46,10 +46,9 @@ export class AuthService {
 
   async login(data: Prisma.UserUncheckedCreateWithoutMessagesInput) {
     const user = await this.usersService.findByEmail(data.email);
-    const payload: { id: number; email: string; username: string } = {
+    const payload: { id: number; email: string } = {
       id: user.id,
       email: user.email,
-      username: user.username,
     };
     return await this.jwtService.signAsync(payload);
   }

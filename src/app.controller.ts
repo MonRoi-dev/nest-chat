@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Redirect,
   Render,
   Req,
   Res,
@@ -35,7 +36,7 @@ export class AppController {
     private readonly roomsServise: RoomsService,
   ) {}
 
-  @Get()
+  @Get('/')
   @Render('index')
   async main(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies.token;
@@ -54,33 +55,35 @@ export class AppController {
     @Query('roomId', ParseIntPipe) roomId: number,
     @Res() res: Response,
     @Req() req: Request,
-  ) {
+  ): Promise<Response> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     const messages = await this.messagesService.getMessages(roomId);
-    res.json({ userId, messages });
+    return res.json({ userId, messages });
   }
 
   @UseGuards(AuthGuard)
   @Get('/contacts')
-  async getContacts(@Req() req: Request, @Res() res: Response) {
+  async getContacts(
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<Response> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     const users = await this.usersService.usersToAdd(userId);
-    res.json({ users });
+    return res.json({ users });
   }
 
   @UseGuards(AuthGuard)
   @Post('/contacts/:id')
+  @Redirect('/')
   async addContact(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  ): Promise<void> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.roomsServise.createRoom(userId, id);
-    return res.redirect('/');
   }
 
   @UseGuards(AuthGuard)
