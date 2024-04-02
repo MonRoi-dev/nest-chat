@@ -70,7 +70,7 @@ const app = () => {
     if (!content.trim()) {
       return;
     } else {
-      sendMessage({ content, userId, roomId });
+      socket.emit('sendMessage', { content, userId, roomId });
       msgInput.value = '';
     }
   }
@@ -79,7 +79,7 @@ const app = () => {
     if (!content.trim()) {
       return;
     } else {
-      editMessage({ content, toEdit });
+      socket.emit('editMessage', { content, messageId: toEdit.id, roomId });
       clearToEdit();
     }
   }
@@ -99,10 +99,6 @@ const app = () => {
       ? handleEditMesage(msgInput.value)
       : handleSendMesage(msgInput.value);
   });
-
-  function sendMessage(payload) {
-    socket.emit('sendMessage', payload);
-  }
 
   socket.on('recMessage', (createdMessage) => {
     allMessages.push(createdMessage);
@@ -134,7 +130,7 @@ const app = () => {
         const userId = await getMessages(roomId);
         joinRoom(roomId, userId);
         leaveRoom(roomId);
-        messagesOptions();
+        getOptions();
       });
     });
   });
@@ -172,7 +168,6 @@ const app = () => {
 
   socket.on('isTyping', (clientId) => {
     if (clientId !== socket.id) {
-      console.log('hello, im not typing');
       typingText.textContent = 'typing...';
       typingText.className = 'typingText';
       contactBar.appendChild(typingText);
@@ -195,39 +190,11 @@ const app = () => {
     imageStatus.className = 'offline';
   });
 
-  function messagesOptions() {
-    const options = document.querySelectorAll('.option__buttons');
-    const newDiv = document.createElement('div');
-
-    options.forEach((btn) => {
-      btn.querySelector('.bi-pencil-fill').addEventListener('click', () => {
-        msgInput.value = '';
-        msgInput.focus();
-        newDiv.className = 'messageToEdit';
-        newDiv.innerHTML = btn.parentElement.innerHTML;
-        msgInput.parentNode.insertBefore(newDiv, msgInput);
-        toEdit = btn.parentElement;
-      });
-
-      btn.querySelector('.bi-trash-fill').addEventListener('click', () => {
-        deleteMessage(btn.parentElement);
-      });
-    });
-  }
-
-  function editMessage(payload) {
-    const message = allMessages.find((msg) => msg.id == payload.toEdit.id);
-    const edited = toEdit.querySelector('.text');
-    edited.textContent = payload.content;
-    message.content = payload.content;
-    socket.emit('editMessage', message);
-  }
-
-  function deleteMessage(messageToDelete) {
-    const message = allMessages.find((msg) => msg.id == messageToDelete.id);
-    socket.emit('deleteMessage', message);
-    messageToDelete.remove();
-  }
+  socket.on('updateMessage', (editedMessage) => {
+    const msgIndex = allMessages.findIndex((msg) => msg.id == editedMessage.id);
+    allMessages[msgIndex] = editedMessage;
+    renderMessages(allMessages, userId);
+  });
 
   function clearToEdit() {
     msgInput.value = '';
@@ -236,6 +203,33 @@ const app = () => {
       toEdit = '';
     }
   }
+
+  function getOptions() {
+    const newDiv = document.createElement('div');
+    document.addEventListener('click', (event) => {
+      const parrent = event.target.closest('.option__buttons').parentElement;
+      if (event.target.classList.contains('bi-trash-fill')) {
+        socket.emit('deleteMessage', { messageId: parrent.id, roomId });
+      } else if (event.target.classList.contains('bi-pencil-fill')) {
+        msgInput.value = '';
+        msgInput.focus();
+        newDiv.className = 'messageToEdit';
+        newDiv.innerHTML = parrent.innerHTML;
+        msgInput.parentNode.insertBefore(newDiv, msgInput);
+        toEdit = parrent;
+      }
+    });
+  }
+
+  socket.on('deleteMessage', (deletedMessage) => {
+    const msgIndex = allMessages.findIndex(
+      (msg) => msg.id == deletedMessage.id,
+    );
+    allMessages.splice(msgIndex, 1);
+    renderMessages(allMessages, userId);
+    const options = document.querySelectorAll('.option__buttons');
+    console.log(options, allMessages);
+  });
 };
 
 app();

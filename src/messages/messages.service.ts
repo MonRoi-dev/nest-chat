@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Message, Prisma } from '@prisma/client';
+import { Message } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
@@ -29,11 +29,11 @@ export class MessagesService {
     });
   }
 
-  async editMessage(
-    id: number,
-    data: Prisma.MessageUpdateInput,
-  ): Promise<Message> {
-    return await this.prisma.message.update({ where: { id }, data });
+  async editMessage(id: number, content: string): Promise<Message> {
+    return await this.prisma.message.update({
+      where: { id },
+      data: { content },
+    });
   }
 
   async deleteMessage(id: number): Promise<Message> {

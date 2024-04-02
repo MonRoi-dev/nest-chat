@@ -17,7 +17,6 @@ import * as cookie from 'cookie';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import * as path from 'path';
-import { Message } from '@prisma/client';
 
 @WebSocketGateway({ cors: true })
 export class MessagesGateway
@@ -80,17 +79,33 @@ export class MessagesGateway
   @SubscribeMessage('editMessage')
   async editMessage(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: Message,
+    @MessageBody()
+    payload: {
+      content: string;
+      messageId: number;
+      roomId: number;
+    },
   ): Promise<void> {
-    await this.messagesService.editMessage(message.id, message);
+    const editedMessage = await this.messagesService.editMessage(
+      +payload.messageId,
+      payload.content,
+    );
+    this.server
+      .to(payload.roomId.toString())
+      .emit('updateMessage', editedMessage);
   }
 
   @SubscribeMessage('deleteMessage')
   async deleteMessage(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: Message,
+    @MessageBody() payload: { messageId: string; roomId: number },
   ): Promise<void> {
-    await this.messagesService.deleteMessage(message.id);
+    const deletedMessage = await this.messagesService.deleteMessage(
+      +payload.messageId,
+    );
+    this.server
+      .to(payload.roomId.toString())
+      .emit('deleteMessage', deletedMessage);
   }
 
   @SubscribeMessage('joinRoom')
