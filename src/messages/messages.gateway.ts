@@ -49,7 +49,7 @@ export class MessagesGateway
 
   @SubscribeMessage('sendImage')
   async handleImage(
-    @ConnectedSocket() socke: Socket,
+    @ConnectedSocket() socket: Socket,
     @MessageBody()
     payload: {
       userId: number;
@@ -68,12 +68,13 @@ export class MessagesGateway
     fs.writeFile(`${imagePath + imageName}`, buffer, (err) => {
       if (err) throw err;
     });
-    await this.messagesService.createMessage(
+    const uploadedImage = await this.messagesService.createMessage(
       imageName,
       payload.userId,
       +payload.roomId,
       true,
     );
+    this.server.to(payload.roomId.toString()).emit('recMessage', uploadedImage);
   }
 
   @SubscribeMessage('editMessage')

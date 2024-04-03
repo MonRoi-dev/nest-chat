@@ -41,8 +41,19 @@ const app = () => {
         hour: '2-digit',
         minute: '2-digit',
       });
-      if (message.roomId == roomId) {
-        if (message.userId === userId) {
+      if (message.userId === userId) {
+        if (message.isImage) {
+          messagesHtml += `<li id="${message.id}" class="replies">
+          <p>
+          <img class="sentImage"
+  src="/images/messages/${message.content}"/>
+            <label class="timeReplied">${time}</label>
+            </p>
+          <div class="option__buttons">
+            <i class="bi bi-trash-fill"></i>
+          </div>
+        </li>`;
+        } else {
           messagesHtml += `<li id="${message.id}" class="replies">
           <p><span class="text">${message.content}</span>
             <label class="timeReplied">${time}</label>
@@ -51,6 +62,16 @@ const app = () => {
             <i class="bi bi-trash-fill"></i>
             <i class="bi bi-pencil-fill"></i>
           </div>
+        </li>`;
+        }
+      } else {
+        if (message.isImage) {
+          messagesHtml += `<li class="sent">
+          <p>
+          <img class="sentImage"
+          src="/images/messages/${message.content}"/>
+            <label class="timeSent">${time}</label>
+          </p>
         </li>`;
         } else {
           messagesHtml += `<li class="sent">
@@ -61,7 +82,6 @@ const app = () => {
         }
       }
     });
-
     msgList.innerHTML = messagesHtml;
     msgBody.scrollTop = msgBody.scrollHeight;
   }
@@ -206,7 +226,7 @@ const app = () => {
 
   function getOptions() {
     const newDiv = document.createElement('div');
-    document.addEventListener('click', (event) => {
+    msgList.addEventListener('click', (event) => {
       const parrent = event.target.closest('.option__buttons').parentElement;
       if (event.target.classList.contains('bi-trash-fill')) {
         socket.emit('deleteMessage', { messageId: parrent.id, roomId });
@@ -229,6 +249,30 @@ const app = () => {
     renderMessages(allMessages, userId);
     const options = document.querySelectorAll('.option__buttons');
     console.log(options, allMessages);
+  });
+
+  const image = document.querySelector('#input__file_att');
+
+  image.addEventListener('change', (event) => {
+    const selectedFile = event.target.files[0];
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      alert('File is too big');
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const payload = {
+        userId,
+        roomId,
+        filename: selectedFile.name,
+        data: reader.result,
+      };
+      socket.emit('sendImage', payload);
+    };
+    reader.readAsArrayBuffer(selectedFile);
   });
 };
 
