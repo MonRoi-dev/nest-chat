@@ -11,10 +11,10 @@
 		</div>
 		<div id="search">
 			<label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
-			<input type="text" placeholder="Search contacts..." />
+			<input id="searchBar" type="text" onkeyup="filterChats()" placeholder="Search contacts..." />
 		</div>
 		<div id="contacts">
-			<ul>
+			<ul class="contacts">
 				<% user.rooms.sort(
 					(a, b) =>
 					  new Date(b.rooms.messages[0]?.createdAt).getTime() -
@@ -84,5 +84,24 @@
 	</div>
 </div>
 <% } %>
+<script>
+	function filterChats() {
+  let input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('searchBar');
+  filter = input.value.toUpperCase();
+  ul = document.querySelector(".contacts");
+  li = ul.getElementsByTagName('li');
+
+  for (let i = 0; i < li.length; i++) {
+    a = li[i].getElementsByClassName("name")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
 <script src="/scripts/script.js"></script>
 </body></html>
