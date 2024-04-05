@@ -51,8 +51,8 @@ export class AppController {
   @Get('/messages')
   async getMessages(
     @Query('roomId', ParseIntPipe) roomId: number,
-    @Res() res: Response,
     @Req() req: Request,
+    @Res() res: Response,
   ): Promise<Response> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
@@ -78,10 +78,12 @@ export class AppController {
   async addContact(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
-  ): Promise<void> {
+    @Res() res: Response,
+  ): Promise<Response> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.roomsServise.createRoom(userId, id);
+    return res.status(200);
   }
 
   @UseGuards(AuthGuard)
@@ -101,12 +103,14 @@ export class AppController {
   )
   async userUpdate(
     @Req() req: Request,
+    @Res() res: Response,
     @Body() data: Prisma.UserUpdateInput,
     @UploadedFile()
     image?: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<Response> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.usersService.updateUser(userId, data, image?.filename);
+    return res.status(200);
   }
 }
