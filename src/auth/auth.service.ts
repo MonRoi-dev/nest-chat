@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -54,6 +59,9 @@ export class AuthService {
   }
 
   async verifyToken(token: string): Promise<User> {
+    if (!token) {
+      throw new BadRequestException();
+    }
     const tokenData = await this.jwtService.verifyAsync(token);
     const userData = await this.usersService.findById(tokenData.id);
     return userData;
