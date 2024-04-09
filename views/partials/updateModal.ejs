@@ -26,7 +26,7 @@
         </div>
         <div class="modal-body modal-body__main">
           <div class="modal__img">
-            <label for="input__file_att">
+            <label for="input__file_update">
               <img
                 class="modal__profile-img"
                 src="/images/<%= user.image %>"
@@ -34,7 +34,7 @@
               />
               <input
                 type="file"
-                id="input__file_att"
+                id="input__file_update"
                 class="iconToUpdate"
                 name="image"
                 accept=".jpg, .jpeg, .png"
@@ -73,7 +73,7 @@
 
   function update(event) {
     event.preventDefault();
-    const url = 'https://nest-chat-zlkp.onrender.com/user';
+    const url = 'http://localhost:5000/user';
     const formData = new FormData(updateForm);
     axios
       .patch(url, formData, {
