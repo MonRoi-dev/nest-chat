@@ -101,6 +101,7 @@ export class AppController {
       }),
     }),
   )
+  @Redirect('/')
   async userUpdate(
     @Req() req: Request,
     @Res() res: Response,
@@ -111,6 +112,6 @@ export class AppController {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.usersService.updateUser(userId, data, image?.filename);
-    return res.redirect(200, '/');
+    res.status(200);
   }
 }
