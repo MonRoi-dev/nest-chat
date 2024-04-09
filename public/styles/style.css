@@ -745,6 +745,9 @@ body {
 #input__file_att {
   display: none;
 }
+#input__file_update {
+  display: none;
+}
 
 .regist__input {
   width: 100%;

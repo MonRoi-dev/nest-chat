@@ -88,7 +88,6 @@ export class AppController {
 
   @UseGuards(AuthGuard)
   @Patch('/user')
-  @Redirect('/')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -102,6 +101,7 @@ export class AppController {
       }),
     }),
   )
+  @Redirect('/', 200)
   async userUpdate(
     @Req() req: Request,
     @Res() res: Response,
