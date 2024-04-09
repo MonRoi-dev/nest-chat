@@ -111,6 +111,6 @@ export class AppController {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.usersService.updateUser(userId, data, image?.filename);
-    res.status(200);
+    return res.redirect(200, '/');
   }
 }

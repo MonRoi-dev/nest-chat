@@ -62,9 +62,7 @@ export class MessagesGateway
     const fileExtension = path.extname(payload.filename);
     const randomName = crypto.randomBytes(16).toString('hex');
     const imageName = randomName + fileExtension;
-    const imagePath = path
-      .join(__dirname, `../public/images/messages/`)
-      .replace('\\dist', '');
+    const imagePath = path.join(process.cwd(), `/public/images/messages/`);
     fs.writeFile(`${imagePath + imageName}`, buffer, (err) => {
       if (err) throw err;
     });

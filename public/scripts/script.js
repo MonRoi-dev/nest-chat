@@ -1,5 +1,5 @@
 const app = () => {
-  const socket = io('https://nest-chat-zlkp.onrender.com');
+  const socket = io('http://localhost:5000');
   const msgInput = document.querySelector('.messageToSend');
   const msgList = document.querySelector('.messageList');
   const sendBtn = document.querySelector('#sendBtn');
@@ -21,7 +21,7 @@ const app = () => {
   async function getMessages(roomId) {
     try {
       const { data } = await axios.get(
-        `https://nest-chat-zlkp.onrender.com/messages?roomId=${roomId}`,
+        `http://localhost:5000/messages?roomId=${roomId}`,
       );
       userId = data.userId;
       renderMessages(data.messages, userId);
