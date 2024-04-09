@@ -73,7 +73,7 @@
 
   function update(event) {
     event.preventDefault();
-    const url = 'http://localhost:5000/user';
+    const url = 'https://nest-chat-zlkp.onrender.com/user';
     const formData = new FormData(updateForm);
     axios
       .patch(url, formData, {

@@ -79,11 +79,11 @@ export class AppController {
     @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<Response> {
+  ): Promise<void> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.roomsServise.createRoom(userId, id);
-    return res.status(200);
+    res.status(200);
   }
 
   @UseGuards(AuthGuard)
@@ -107,10 +107,10 @@ export class AppController {
     @Body() data: Prisma.UserUpdateInput,
     @UploadedFile()
     image?: Express.Multer.File,
-  ): Promise<Response> {
+  ): Promise<void> {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.usersService.updateUser(userId, data, image?.filename);
-    return res.status(200);
+    res.status(200);
   }
 }
