@@ -37,6 +37,10 @@ export class MessagesService {
   }
 
   async deleteMessage(id: number): Promise<Message> {
-    return await this.prisma.message.delete({ where: { id } });
+    try {
+      return await this.prisma.message.delete({ where: { id } });
+    } catch {
+      return;
+    }
   }
 }
