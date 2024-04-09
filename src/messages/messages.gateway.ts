@@ -18,7 +18,7 @@ import * as fs from 'fs';
 import * as crypto from 'crypto';
 import * as path from 'path';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: true, allowEIO3: true })
 export class MessagesGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {

@@ -247,8 +247,6 @@ const app = () => {
     );
     allMessages.splice(msgIndex, 1);
     renderMessages(allMessages, userId);
-    const options = document.querySelectorAll('.option__buttons');
-    console.log(options, allMessages);
   });
 
   const image = document.querySelector('#input__file_att');
