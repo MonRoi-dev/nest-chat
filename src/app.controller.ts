@@ -88,6 +88,7 @@ export class AppController {
 
   @UseGuards(AuthGuard)
   @Patch('/user')
+  @Redirect('/')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -111,6 +112,5 @@ export class AppController {
     const token = req.cookies.token;
     const { id: userId } = await this.authService.verifyToken(token);
     await this.usersService.updateUser(userId, data, image?.filename);
-    res.status(200);
   }
 }
